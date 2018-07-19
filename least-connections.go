@@ -13,7 +13,7 @@ import (
 // ErrServersNotExist is the error that servers dose not exists
 var ErrServersNotExist = errors.New("servers dose not exist")
 
-// ErrServerNotExist is the error that servers dose not exists
+// ErrServerNotExist is the error that server dose not exists
 var ErrServerNotExist = errors.New("server dose not exist")
 
 // Servers is custom type of servers
