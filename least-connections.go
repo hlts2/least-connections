@@ -1,7 +1,5 @@
 package leastconnections
 
-// TODO: write test code
-
 import (
 	"log"
 
