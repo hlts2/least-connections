@@ -14,9 +14,6 @@ var ErrServersNotExist = errors.New("servers dose not exist")
 // ErrServerNotExist is the error that server dose not exists
 var ErrServerNotExist = errors.New("server dose not exist")
 
-// Servers is custom type of servers
-type Servers []string
-
 type LeastConnections interface {
 	IncrementConnections(server string)
 	DecrementConnections(server string)
@@ -24,13 +21,13 @@ type LeastConnections interface {
 }
 
 type leastConnections struct {
-	servers     Servers
+	servers     []string
 	connections map[string]int
 	lf          lockfree.LockFree
 }
 
 // New initializes a new instance of LeastConnected
-func New(servers Servers) (LeastConnections, error) {
+func New(servers []string) (LeastConnections, error) {
 	if len(servers) == 0 {
 		return nil, ErrServersNotExist
 	}

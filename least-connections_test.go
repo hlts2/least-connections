@@ -5,7 +5,7 @@ import (
 )
 
 func TestLeastConnections(t *testing.T) {
-	lc, err := New(Servers{
+	lc, err := New([]string{
 		"server-1",
 		"server-2",
 		"server-3",
