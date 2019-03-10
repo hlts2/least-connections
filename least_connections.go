@@ -21,7 +21,7 @@ type conn struct {
 }
 
 type leastConnections struct {
-	conns []*conn
+	conns []conn
 	mu    *sync.Mutex
 }
 
@@ -31,9 +31,9 @@ func New(urls []*url.URL) (LeastConnections, error) {
 		return nil, ErrServersNotExist
 	}
 
-	conns := make([]*conn, len(urls))
+	conns := make([]conn, len(urls))
 	for i := range conns {
-		conns[i] = &conn{
+		conns[i] = conn{
 			url: urls[i],
 			cnt: 0,
 		}
