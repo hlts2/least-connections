@@ -1,5 +1,5 @@
 # least-connections
-least-connections is lock-free least-connections balancing algorithm written in golang
+least-connections is least-connections balancing algorithm written in golang
 
 ## Requrement
 
