@@ -10,14 +10,18 @@ import (
 // ErrServersNotExist is the error that servers dose not exists
 var ErrServersNotExist = errors.New("servers dose not exist")
 
-// LeastConnections --
+// LeastConnections is an interface for representing least-connections balancing.
 type LeastConnections interface {
 	Next() (next *url.URL, done func())
 }
 
+type conn struct {
+	url *url.URL
+	cnt int
+}
+
 type leastConnections struct {
-	urls  []*url.URL
-	conns map[int]int
+	conns []*conn
 	mu    *sync.Mutex
 }
 
@@ -27,13 +31,15 @@ func New(urls []*url.URL) (LeastConnections, error) {
 		return nil, ErrServersNotExist
 	}
 
-	conns := make(map[int]int)
-	for i := range urls {
-		conns[i] = 0
+	conns := make([]*conn, len(urls))
+	for i := range conns {
+		conns[i] = &conn{
+			url: urls[i],
+			cnt: 0,
+		}
 	}
 
 	return &leastConnections{
-		urls:  urls,
 		conns: conns,
 		mu:    new(sync.Mutex),
 	}, nil
@@ -47,20 +53,19 @@ func (lc *leastConnections) Next() (*url.URL, func()) {
 
 	lc.mu.Lock()
 
-	for urlIdx, cnt := range lc.conns {
-		if min == -1 || cnt < min {
-			min = cnt
-			idx = urlIdx
+	for i, conn := range lc.conns {
+		if min == -1 || conn.cnt < min {
+			min = conn.cnt
+			idx = i
 		}
 	}
-
-	lc.conns[idx]++
+	lc.conns[idx].cnt++
 
 	lc.mu.Unlock()
 
-	return lc.urls[idx], func() {
+	return lc.conns[idx].url, func() {
 		lc.mu.Lock()
-		lc.conns[idx]--
+		lc.conns[idx].cnt--
 		lc.mu.Unlock()
 	}
 }
