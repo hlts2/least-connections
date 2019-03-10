@@ -15,27 +15,22 @@ go get github.com/hlts2/least-connections
 
 ### Basic Example
 ```go
-lc, err := leastconnections.New([]string{
-		"server-1",
-		"server-2",
-		"server-3",
-    })
+lc, err := New([]*url.URL{
+    {Host: "192.168.33.10"},
+    {Host: "192.168.33.11"},
+    {Host: "192.168.33.12"},
+})
 
-// return the server with the least number of connections
-server := lc.Next()
+src1, done1 := lc.Next() // {Host: "192.168.33.10"}
 
-```
+src2, done2 := lc.Next() // {Host: "192.168.33.11"}
 
-### Connection Management
-```go
+done1() // Reduce connection of src1
 
-// Increment the number of connections of server1
-lc.IncrementConnections(server1) // i.e) server1 is "server-1"
-
-// Decrement the number of connections of server1
-lc.DecrementConnections(server1) // i.e) server1 is "server-1"
+src3, done3 := lc.Next() // {Host: "192.168.33.10"}
 
 ```
+
 
 ## Author
 [hlts2](https://github.com/hlts2)
