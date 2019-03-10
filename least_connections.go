@@ -2,6 +2,8 @@ package leastconnections
 
 import (
 	"log"
+	"net/url"
+	"sync"
 
 	"github.com/pkg/errors"
 
@@ -24,23 +26,27 @@ type leastConnections struct {
 	servers     []string
 	connections map[string]int
 	lf          lockfree.LockFree
+
+	urls []*url.URL
+	mu   *sync.Mutex
 }
 
 // New initializes a new instance of LeastConnected
-func New(servers []string) (LeastConnections, error) {
-	if len(servers) == 0 {
+func New(urls []*url.URL) (LeastConnections, error) {
+	if len(urls) == 0 {
 		return nil, ErrServersNotExist
 	}
 
 	connections := make(map[string]int)
-	for _, server := range servers {
-		connections[server] = 0
+	for _, url := range urls {
+		connections[url.Scheme+"://"+url.Host] = 0
 	}
 
 	return &leastConnections{
-		servers:     servers,
+		urls:        urls,
 		connections: connections,
 		lf:          lockfree.New(),
+		mu:          new(sync.Mutex),
 	}, nil
 }
 
