@@ -1,48 +1,49 @@
 package leastconnections
 
-// func TestLeastConnections(t *testing.T) {
-// 	lc, err := New([]string{
-// 		"server-1",
-// 		"server-2",
-// 		"server-3",
-// 	})
-//
-// 	if err != nil {
-// 		t.Error("New is nil")
-// 	}
-//
-// 	server1 := lc.Next()
-// 	if "server-1" != server1 {
-// 		t.Errorf("Next is not wrong. expected: %v, got: %v", "server-1", server1)
-// 	}
-// 	lc.IncrementConnections(server1)
-//
-// 	server2 := lc.Next()
-// 	if "server-2" != server2 {
-// 		t.Errorf("Next is not wrong. expected: %v, got: %v", "server-2", server2)
-// 	}
-// 	lc.IncrementConnections(server2)
-//
-// 	lc.DecrementConnections(server1)
-//
-// 	server1 = lc.Next()
-// 	if "server-1" != server1 {
-// 		t.Errorf("Next is not wrong. expected: %v, got: %v", "server-1", server1)
-// 	}
-//
-// 	lc.IncrementConnections(server1)
-//
-// 	server3 := lc.Next()
-// 	if "server-3" != server3 {
-// 		t.Errorf("Next is not wrong. expected: %v, got: %v", "server-3", server3)
-// 	}
-//
-// 	lc.DecrementConnections(server1)
-// 	lc.DecrementConnections(server2)
-// 	lc.DecrementConnections(server3)
-//
-// 	server1 = lc.Next()
-// 	if "server-1" != server1 {
-// 		t.Errorf("Next is not wrong. expected: %v, got: %v", "server-1", server1)
-// 	}
-// }
+import (
+	"net/url"
+	"reflect"
+	"testing"
+)
+
+func TestLeastConnections(t *testing.T) {
+	lc, err := New([]*url.URL{
+		{Host: "192.168.33.10"},
+		{Host: "192.168.33.11"},
+		{Host: "192.168.33.12"},
+	})
+	if err != nil {
+		t.Error("New returns nil")
+	}
+
+	url1, done1 := lc.Next()
+	if got, want := url1, (&url.URL{Host: "192.168.33.10"}); !reflect.DeepEqual(got, want) {
+		t.Errorf("Next is wrong. want: %v, but got: %v", want, got)
+	}
+
+	url2, done2 := lc.Next()
+	if got, want := url2, (&url.URL{Host: "192.168.33.11"}); !reflect.DeepEqual(got, want) {
+		t.Errorf("Next is wrong. want: %v, but got: %v", want, got)
+	}
+	done1()
+
+	url3, done3 := lc.Next()
+	if got, want := url3, (&url.URL{Host: "192.168.33.10"}); !reflect.DeepEqual(got, want) {
+		t.Errorf("Next is wrong. want: %v, but got: %v", want, got)
+	}
+
+	url4, done4 := lc.Next()
+	if got, want := url4, (&url.URL{Host: "192.168.33.12"}); !reflect.DeepEqual(got, want) {
+		t.Errorf("Next is wrong. want: %v, but got: %v", want, got)
+	}
+
+	url5, done5 := lc.Next()
+	if got, want := url5, (&url.URL{Host: "192.168.33.10"}); !reflect.DeepEqual(got, want) {
+		t.Errorf("Next is wrong. want: %v, but got: %v", want, got)
+	}
+
+	done2()
+	done3()
+	done4()
+	done5()
+}
